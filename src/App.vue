@@ -28,7 +28,7 @@
 
 <script>
 import IndexNav from "./components/header.vue";
-import { marked } from 'marked'
+
 
 function get_catalogue_from_url() {
     console.log("get_catalogue_from_url")
@@ -36,10 +36,12 @@ function get_catalogue_from_url() {
     return fetch(catalogue_url)
         .then(response => response.json())
         .then(data => {
-            const catalogue = data.map(element => ({
-                'name': element['name'].substr(0, element['name'].length - 3),
-                'download_url': element['download_url']
-            }))
+            const catalogue = data
+                .filter(element => element['download_url'] !== null)
+                .map(element => ({
+                    'name': element['name'].substr(0, element['name'].length - 3),
+                    'download_url': element['download_url']
+                }))
             return catalogue;
         });
 }
@@ -59,6 +61,7 @@ export default {
     },
     methods: {
         async init() {
+            // console.log()  // 输出当前路由信息
             var catalogue = this.get_catalogue_from_cookie();
             if (!catalogue) {
                 catalogue = await get_catalogue_from_url();
@@ -66,8 +69,15 @@ export default {
                 this.$cookies.set("catalogue", JSON.stringify(catalogue));
             }
             this.catalogue = catalogue;
-            // 显示第一篇文章
-            this.view_note(catalogue[0].download_url)
+            var note_name = decodeURIComponent(window.location.hash.slice(1));
+            var note = catalogue.find(element => element.name === note_name);
+            if (note) {
+                // 显示路由文章
+                this.view_note(note.download_url);
+            } else {
+                // 显示第一篇文章
+                this.view_note(catalogue[0].download_url);
+            }
         },
 
         get_catalogue_from_cookie() {
@@ -75,11 +85,14 @@ export default {
             return this.$cookies.get('catalogue');
         },
         async view_note(note_url) {
+
             fetch(note_url)
                 .then(response => response.text())
-                .then(text => {
-                    this.note_content = marked.parse(text);
-                })
+                .then(async text => {
+                    // 使用正则表达式进行替换
+                    const replacedText = text.replace(/\!\[([^\]]+)\]\(\.\/([^\)]+)\)/g, "![\$1](https://raw.githubusercontent.com/rener2020/note/main/SLAM/orbslam/\$2)");
+                    this.note_content = this.$markjax.render(replacedText);
+                });
         }
     },
     watch: {
@@ -87,3 +100,12 @@ export default {
     },
 };
 </script>
+
+<style>
+img {
+    max-width: 100%;
+    /* 图片的最大宽度为父元素的宽度 */
+    height: auto;
+    /* 高度自动调整以保持纵横比 */
+}
+</style>
