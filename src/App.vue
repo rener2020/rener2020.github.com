@@ -10,8 +10,8 @@
                 <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary catalogue">
                     <div class="list-group list-group-flush border-bottom scrollarea" id="catalogue">
                         <!-- catalogue one -->
-                        <a :href="'#' + item.name" @click="view_note(item.download_url)" class="list-group-item list-group-item-action py-3 lh-sm "
-                            v-for="(item) in catalogue">
+                        <a :href="'#' + item.name" @click="view_note(item.download_url)"
+                            class="list-group-item list-group-item-action py-3 lh-sm " v-for="(item) in catalogue">
                             <div class="d-flex w-100 align-items-center justify-content-between">
                                 <strong class="mb-1">{{ item.name }}</strong>
                             </div>
@@ -28,7 +28,7 @@
 
 <script>
 import IndexNav from "./components/header.vue";
-import {marked} from 'marked'
+import { marked } from 'marked'
 
 function get_catalogue_from_url() {
     console.log("get_catalogue_from_url")
@@ -53,7 +53,7 @@ export default {
     },
     data() {
         return {
-            catalogue: null ,// 设置初始值
+            catalogue: null,// 设置初始值
             note_content: null,
         };
     },
@@ -66,6 +66,8 @@ export default {
                 this.$cookies.set("catalogue", JSON.stringify(catalogue));
             }
             this.catalogue = catalogue;
+            // 显示第一篇文章
+            this.view_note(catalogue[0].download_url)
         },
 
         get_catalogue_from_cookie() {
@@ -77,7 +79,6 @@ export default {
                 .then(response => response.text())
                 .then(text => {
                     this.note_content = marked.parse(text);
-                    console.log(text);
                 })
         }
     },
