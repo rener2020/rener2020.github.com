@@ -63,6 +63,7 @@ export default {
         async init() {
             // console.log()  // 输出当前路由信息
             var catalogue = this.get_catalogue_from_cookie();
+            var catalogue = JSON.parse(localStorage.getItem('catalogue'));
             if (!catalogue) {
                 catalogue = await get_catalogue_from_url();
                 // set catalogue to cookie
@@ -70,6 +71,7 @@ export default {
                 console.log("Cookie set successfully");
                 console.log(JSON.stringify(catalogue));
                 console.log(this.$cookies.get("catalogue"));
+                localStorage.setItem('catalogue', JSON.stringify(catalogue));
             }
             this.catalogue = catalogue;
             var note_name = decodeURIComponent(window.location.hash.slice(1));
