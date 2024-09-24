@@ -68,7 +68,7 @@ export default {
                 // set catalogue to cookie
                 this.$cookies.set("catalogue", JSON.stringify(catalogue));
                 console.log("Cookie set successfully");
-                console.log(this.$cookies.get(JSON.stringify(catalogue)));
+                console.log(JSON.stringify(catalogue));
                 console.log(this.$cookies.get("catalogue"));
             }
             this.catalogue = catalogue;
